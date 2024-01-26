@@ -97,8 +97,7 @@ namespace GameDev.Shared.BaseServices
         public static string GetVersionString()
         {
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            DateTime buildDate = new DateTime(2000, 1, 1)
-                                    .AddDays(version.Build).AddSeconds(version.Revision * 2);
+            DateTime buildDate = DateTime.Now;                                    
             return $"{version} ({buildDate})";
         }
     }

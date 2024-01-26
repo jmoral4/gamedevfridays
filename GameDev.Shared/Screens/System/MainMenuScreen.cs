@@ -24,47 +24,25 @@ namespace GameDev.Shared.Screens.System
         /// Constructor fills in the menu contents.
         /// </summary>
         public MainMenuScreen()
-            : base("Rogue Squad \nBuild: " + VersionInfo.GetVersionString())
-        {
-            //Daniel Birch - The Shape Of Nothing
-
-
+            : base("Vampire Survivor Clone \nBuild: " + VersionInfo.GetVersionString())
+        {            
             // Create our menu entries.
-            MenuEntry playGameMenuEntry = new MenuEntry("AI Testbed");
-            MenuEntry animationTest = new MenuEntry("Sound and Animation Test");
-            MenuEntry optionsMenuEntry = new MenuEntry("Options");
-            MenuEntry setpieceEditorMenuEntry = new MenuEntry("Breakout");
-            MenuEntry npcEditorMenuEntry = new MenuEntry("Future Feature...");
-            MenuEntry objectEditorMenuEntry = new MenuEntry("Future Feature...");
+            MenuEntry playGameMenuEntry = new MenuEntry("Vampire Survivor Clone");            
+            MenuEntry optionsMenuEntry = new MenuEntry("Options");            
             MenuEntry exitMenuEntry = new MenuEntry("Exit");
 
 
 
             // Hook up menu event handlers.
-            playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
-            animationTest.Selected += AnimationTest_Selected;
-            optionsMenuEntry.Selected += OptionsMenuEntrySelected;
-            setpieceEditorMenuEntry.Selected += SetpieceEditorMenuEntrySelected;
-            npcEditorMenuEntry.Selected += NpcEditorMenuEntrySelected;
-            objectEditorMenuEntry.Selected += ObjectEditorMenuEntrySelected;
+            playGameMenuEntry.Selected += PlayGameMenuEntrySelected;            
+            optionsMenuEntry.Selected += OptionsMenuEntrySelected;            
             exitMenuEntry.Selected += OnCancel;
 
             // Add entries to the menu.
-            MenuEntries.Add(playGameMenuEntry);
-            MenuEntries.Add(animationTest);
+            MenuEntries.Add(playGameMenuEntry);            
             MenuEntries.Add(optionsMenuEntry);
-            MenuEntries.Add(setpieceEditorMenuEntry);
-            MenuEntries.Add(npcEditorMenuEntry);
-            MenuEntries.Add(objectEditorMenuEntry);
             MenuEntries.Add(exitMenuEntry);
         }
-
-        private void AnimationTest_Selected(object sender, PlayerIndexEventArgs e)
-        {
-            //LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new SoundAndAnimationTestScreen());
-        }
-
-
         #endregion
 
         #region Handle Input
@@ -75,36 +53,9 @@ namespace GameDev.Shared.Screens.System
         /// </summary>
         void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            //LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new AITestBed());
+            LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new VampireSurvivorCloneScreen());
         }
-
-
-
-
-        /// <summary>
-        /// Event handler for when the Play Game menu entry is selected.
-        /// </summary>
-        void SetpieceEditorMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-          //  LoadingScreen.Load(ScreenManager, true, e.PlayerIndex,new BreakOut());
-        }
-
-        /// <summary>
-        /// Event handler for when the Play Game menu entry is selected.
-        /// </summary>
-        void NpcEditorMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-           // LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new BreakOut());
-        }
-
-        /// <summary>
-        /// Event handler for when the Play Game menu entry is selected.
-        /// </summary>
-        void ObjectEditorMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-           // LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new OldCollisionTestScreen());
-        }
-
+       
         /// <summary>
         /// Event handler for when the Options menu entry is selected.
         /// </summary>
