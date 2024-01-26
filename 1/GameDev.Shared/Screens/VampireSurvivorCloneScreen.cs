@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using MonoGame.Extended;
+
 
 namespace GameDev.Shared.Screens
 {
@@ -22,6 +22,13 @@ namespace GameDev.Shared.Screens
         float pauseAlpha;
         bool paused = false;
         private FrameCounter _frameCounter = new FrameCounter();
+
+        private Vector2 characterPosition;
+        private Vector2 spellOffset; // Offset from the character to the spell
+        private float rotationAngle;
+        private float rotationRadius; // The distance from the character to the spell
+        Vector2 characterCenter;
+
 
         public VampireSurvivorCloneScreen()
         {
@@ -37,40 +44,49 @@ namespace GameDev.Shared.Screens
                 new Buttons[] { Buttons.Start },
                 new Keys[] { Keys.Space }, true);
 
-        }       
+
+
+        }
 
         public override void Activate(bool instancePreserved)
         {
-           if (!instancePreserved)
+            if (!instancePreserved)
             {
 
                 if (content == null)
                     content = new ContentManager(ScreenManager.Game.Services, "Content");
-                
+
                 OSInfo.Instance.DebugListAllStats();
 
                 //load the textures
                 _gameFont = content.Load<SpriteFont>("Fonts/gamefont");
 
-                //UncapFramerate();
+                // toggle fixed (60fps locked) vs unlocked timestep
+                this.ScreenManager.Game.IsFixedTimeStep = false;
+
+                // Get the current graphics device manager and disable V-Sync
+                var graphicsDeviceManager = this.ScreenManager.Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+                if (graphicsDeviceManager != null)
+                {
+                    graphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
+                    graphicsDeviceManager.ApplyChanges();
+                }
+
+                // Set the character position to the middle of the screen for this example
+                characterPosition = new Vector2(100, 100);
+                characterCenter = new Vector2(
+                    characterPosition.X + 16 / 2,
+                    characterPosition.Y + 16 / 2
+                );
+                // Initialize the rotation radius
+                rotationRadius = 50; // Distance from the character
+                rotationAngle = 0; // Starting angle
+
+                // Calculate the initial offset
+                spellOffset = new Vector2(rotationRadius, 0);
             }
 
         }
-
-        private void UncapFramerate()
-        {
-            //toggle fixed (60fps locked) vs unlocked timestep
-            this.ScreenManager.Game.IsFixedTimeStep = false;
-
-            // Get the current graphics device manager and disable V-Sync
-            var graphicsDeviceManager = this.ScreenManager.Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-            if (graphicsDeviceManager != null)
-            {
-                graphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
-                graphicsDeviceManager.ApplyChanges();
-            }
-        }
-
 
         public override void Deactivate()
         {
@@ -99,6 +115,24 @@ namespace GameDev.Shared.Screens
 
             if (!paused)
             {
+                // Time elapsed since the last call to Update
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                float rotationSpeed = 5.0f;
+                // Update the rotation angle for the spell
+                rotationAngle += rotationSpeed * elapsedTime; // This will move the spell in a circle over time
+
+                // Ensure the rotation angle stays within the range of 0 to 2*PI radians
+                if (rotationAngle > MathHelper.TwoPi)
+                {
+                    rotationAngle -= MathHelper.TwoPi;
+                }
+
+                // Calculate the spell's offset from the character
+                spellOffset = new Vector2(
+                    rotationRadius * (float)Math.Cos(rotationAngle),
+                    rotationRadius * (float)Math.Sin(rotationAngle)
+                );
 
             }
 
@@ -132,7 +166,7 @@ namespace GameDev.Shared.Screens
             {
                 // simple game pause
                 paused = !paused;
-            }           
+            }
             else
             {
                 // handle input in generic case
@@ -141,14 +175,14 @@ namespace GameDev.Shared.Screens
             var mouseState = Mouse.GetState();
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                var mousePosition = new Point(mouseState.X, mouseState.Y);                
+                var mousePosition = new Point(mouseState.X, mouseState.Y);
                 Debug.WriteLine($"MOUSE:{mousePosition.X},{mousePosition.Y}");
             }
 
         }
 
         public override void Draw(GameTime gameTime)
-        {            
+        {
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
@@ -159,14 +193,22 @@ namespace GameDev.Shared.Screens
             SpriteBatch _spriteBatch = ScreenManager.SpriteBatch;
 
             _spriteBatch.Begin();
+
             // Draw everything here...
-            _spriteBatch.End();            
+
+            // Draw the character at the characterPosition
+            _spriteBatch.FillRectangle(characterPosition, new Vector2(16, 16), Color.White);
+
+            Vector2 spellPosition = characterCenter + spellOffset;
+            _spriteBatch.FillRectangle(spellPosition, new Vector2(5, 5), Color.Red, 0f);
+
+            _spriteBatch.End();
 
 
-            
+
             // DRAW DEBUG INFO ON TOPMOST LAYER
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(_gameFont, fps, new Microsoft.Xna.Framework.Vector2(1, 1), Color.Black);            
+            _spriteBatch.DrawString(_gameFont, fps, new Microsoft.Xna.Framework.Vector2(1, 1), Color.Black);
             _spriteBatch.End();
 
         }
