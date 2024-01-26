@@ -23,6 +23,13 @@ namespace GameDev.Shared.Screens
         bool paused = false;
         private FrameCounter _frameCounter = new FrameCounter();
 
+        private Vector2 characterPosition;
+        private Vector2 spellOffset; // Offset from the character to the spell
+        private float rotationAngle;
+        private float rotationRadius; // The distance from the character to the spell
+        Vector2 characterCenter;
+
+
         public VampireSurvivorCloneScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
@@ -55,16 +62,28 @@ namespace GameDev.Shared.Screens
                 _gameFont = content.Load<SpriteFont>("Fonts/gamefont");
 
                 // toggle fixed (60fps locked) vs unlocked timestep
-                //this.ScreenManager.Game.IsFixedTimeStep = false;
+                this.ScreenManager.Game.IsFixedTimeStep = false;
 
-                //// Get the current graphics device manager and disable V-Sync
-                //var graphicsDeviceManager = this.ScreenManager.Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-                //if (graphicsDeviceManager != null)
-                //{
-                //    graphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
-                //    graphicsDeviceManager.ApplyChanges();
-                //}
+                // Get the current graphics device manager and disable V-Sync
+                var graphicsDeviceManager = this.ScreenManager.Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+                if (graphicsDeviceManager != null)
+                {
+                    graphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
+                    graphicsDeviceManager.ApplyChanges();
+                }
 
+                // Set the character position to the middle of the screen for this example
+                characterPosition = new Vector2(100, 100);
+                characterCenter = new Vector2(
+                    characterPosition.X + 16 / 2,
+                    characterPosition.Y + 16 / 2
+                );
+                // Initialize the rotation radius
+                rotationRadius = 50; // Distance from the character
+                rotationAngle = 0; // Starting angle
+
+                // Calculate the initial offset
+                spellOffset = new Vector2(rotationRadius, 0);
             }
 
         }
@@ -96,6 +115,24 @@ namespace GameDev.Shared.Screens
 
             if (!paused)
             {
+                // Time elapsed since the last call to Update
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                float rotationSpeed = 5.0f;
+                // Update the rotation angle for the spell
+                rotationAngle += rotationSpeed * elapsedTime; // This will move the spell in a circle over time
+
+                // Ensure the rotation angle stays within the range of 0 to 2*PI radians
+                if (rotationAngle > MathHelper.TwoPi)
+                {
+                    rotationAngle -= MathHelper.TwoPi;
+                }
+
+                // Calculate the spell's offset from the character
+                spellOffset = new Vector2(
+                    rotationRadius * (float)Math.Cos(rotationAngle),
+                    rotationRadius * (float)Math.Sin(rotationAngle)
+                );
 
             }
 
@@ -156,7 +193,15 @@ namespace GameDev.Shared.Screens
             SpriteBatch _spriteBatch = ScreenManager.SpriteBatch;
 
             _spriteBatch.Begin();
+
             // Draw everything here...
+
+            // Draw the character at the characterPosition
+            _spriteBatch.FillRectangle(characterPosition, new Vector2(16, 16), Color.White);
+
+            Vector2 spellPosition = characterCenter + spellOffset;
+            _spriteBatch.FillRectangle(spellPosition, new Vector2(5, 5), Color.Red, 0f);
+
             _spriteBatch.End();
 
 
