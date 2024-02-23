@@ -84,7 +84,12 @@ namespace InitialGameExperiment
             {
                 Velocity.X = MovementSpeed;
             }
-            Location.Offset(Velocity * deltaTime);
+            if (CurrentAnimationType != AnimationTypes.RunLeft && CurrentAnimationType != AnimationTypes.RunRight)
+            {
+                Velocity = Vector2.Zero;
+            }
+            Location = new Rectangle((int)(Location.X + Velocity.X * deltaTime), (int)(Location.Y + Velocity.Y * deltaTime), Location.Width, Location.Height);
+            //Location.Offset(Velocity * deltaTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
