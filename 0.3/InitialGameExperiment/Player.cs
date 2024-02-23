@@ -58,6 +58,15 @@ namespace InitialGameExperiment
 
         }
 
+        public void Idle()
+        {
+            if (Animations.ContainsKey(AnimationTypes.Idle))
+            {
+                CurrentAnimation = Animations[AnimationTypes.Idle];
+                CurrentAnimationType = AnimationTypes.Idle;
+            }
+        }
+
         public void RunRight()
         {
             if (Animations.ContainsKey(AnimationTypes.RunRight))

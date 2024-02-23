@@ -10,16 +10,12 @@ namespace InitialGameExperiment
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private SpriteFont _gameFont;
-        private Vector2 _player1ScoreLocation;
-        private Vector2 _player2ScoreLocation;        
-        AnimatedSprite _axeGuyAttack;
-        AnimatedSprite _axeGuyWalk;
-        private Vector2 _axeGuyWalkVelocity;
-        private Rectangle _axeGuyLocation;
+        private SpriteFont _gameFont;   
         private int _player1Score;
         private int _player2Score;
         private int _maxScore;
+        private Vector2 _playerScoreLocation1;
+        private Vector2 _playerScoreLocation2;
         Player _p1;
         
 
@@ -62,14 +58,8 @@ namespace InitialGameExperiment
             _p1.AddSprite(AnimationTypes.Idle, "Woodcutter_attack1", 48, 48, 6);
             _p1.Init(AnimationTypes.Idle);
 
-            _axeGuyAttack = new AnimatedSprite(Content, "Woodcutter_attack1", 48, 48, 6);
-            _axeGuyWalk = new AnimatedSprite(Content, "Woodcutter_walk", 48, 48, 6);
-            // Woodcutter_walk
-            _axeGuyAttack.SetAnimation(6);
-            _axeGuyAttack.Start();
-
-            _axeGuyWalk.SetAnimation(6);
-            _axeGuyWalk.Start();
+            _playerScoreLocation1 = new Vector2(10, 10);
+            _playerScoreLocation2 = new Vector2(10, _graphics.GraphicsDevice.Viewport.Height - 100);
 
             _player1Score = 0;
             _player2Score = 0;
@@ -81,10 +71,7 @@ namespace InitialGameExperiment
         }
 
         private void InitializeGameBoard()
-        {
-            _player1ScoreLocation = new Vector2(10, 10);
-            _player2ScoreLocation = new Vector2(10, 600);
-            _axeGuyLocation = new Rectangle(400, 200, 144, 144);
+        {            
             _gameStates = GameStates.Setup;
             /*
                     ---------------------------------
@@ -103,9 +90,7 @@ namespace InitialGameExperiment
 
         protected override void Update(GameTime gameTime)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;            
-            float walkSpeed = 200f;
-
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;                        
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -121,25 +106,19 @@ namespace InitialGameExperiment
             {
                 _p1.Update(gameTime);
 
-                _axeGuyAttack.Update(gameTime);
-                _axeGuyWalk.Update(gameTime);
-
                 if (Keyboard.GetState().IsKeyDown(Keys.A))
                 {
-                    _p1.RunLeft();
-                    _axeGuyWalkVelocity.X = -walkSpeed;
+                    _p1.RunLeft();                    
 
                 }
                 else if (Keyboard.GetState().IsKeyDown(Keys.D))
                 {
-                    _p1.RunRight();
-                    _axeGuyWalkVelocity.X = walkSpeed;
+                    _p1.RunRight();                    
                 }
                 else
                 {
-                    _axeGuyWalkVelocity.X = 0;
-                }
-                _axeGuyLocation.Offset(_axeGuyWalkVelocity * deltaTime);
+                    _p1.Idle();
+                }               
             }
 
 
@@ -157,10 +136,9 @@ namespace InitialGameExperiment
 
             _spriteBatch.Begin();
 
-            _p1.Draw(_spriteBatch);
-            _axeGuyWalk.Draw(_spriteBatch, _axeGuyLocation, Color.White);
-            _spriteBatch.DrawString(_gameFont, _player1Score.ToString(),_player1ScoreLocation, Color.Black);
-            _spriteBatch.DrawString(_gameFont, _player2Score.ToString(),_player2ScoreLocation, Color.Black); ;
+            _p1.Draw(_spriteBatch);            
+            _spriteBatch.DrawString(_gameFont, _player1Score.ToString(),_playerScoreLocation1, Color.Black);
+            _spriteBatch.DrawString(_gameFont, _player2Score.ToString(),_playerScoreLocation2, Color.Black); ;
 
              
 
