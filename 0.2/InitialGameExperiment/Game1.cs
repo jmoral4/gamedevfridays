@@ -20,6 +20,7 @@ namespace InitialGameExperiment
         private int _player1Score;
         private int _player2Score;
         private int _maxScore;
+        Player _p1;
         
 
         private enum GameStates {
@@ -53,6 +54,13 @@ namespace InitialGameExperiment
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _gameFont = Content.Load<SpriteFont>("gamefont");
+
+
+            _p1 = new Player(Content, new Rectangle(200, 200, 144, 144));
+            _p1.AddSprite(AnimationTypes.RunLeft, "Woodcutter_walk", 48, 48, 6);
+            _p1.AddSprite(AnimationTypes.RunRight, "Woodcutter_walk", 48, 48, 6);
+            _p1.AddSprite(AnimationTypes.Idle, "Woodcutter_attack1", 48, 48, 6);
+            _p1.Init(AnimationTypes.Idle);
 
             _axeGuyAttack = new AnimatedSprite(Content, "Woodcutter_attack1", 48, 48, 6);
             _axeGuyWalk = new AnimatedSprite(Content, "Woodcutter_walk", 48, 48, 6);
@@ -96,7 +104,7 @@ namespace InitialGameExperiment
         protected override void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;            
-            float walkSpeed = 400f;
+            float walkSpeed = 200f;
 
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -111,17 +119,20 @@ namespace InitialGameExperiment
             }
             else if (_gameStates == GameStates.Playing)
             {
+                _p1.Update(gameTime);
+
                 _axeGuyAttack.Update(gameTime);
                 _axeGuyWalk.Update(gameTime);
 
                 if (Keyboard.GetState().IsKeyDown(Keys.A))
                 {
-
+                    _p1.RunLeft();
                     _axeGuyWalkVelocity.X = -walkSpeed;
 
                 }
                 else if (Keyboard.GetState().IsKeyDown(Keys.D))
                 {
+                    _p1.RunRight();
                     _axeGuyWalkVelocity.X = walkSpeed;
                 }
                 else
@@ -146,6 +157,7 @@ namespace InitialGameExperiment
 
             _spriteBatch.Begin();
 
+            _p1.Draw(_spriteBatch);
             _axeGuyWalk.Draw(_spriteBatch, _axeGuyLocation, Color.White);
             _spriteBatch.DrawString(_gameFont, _player1Score.ToString(),_player1ScoreLocation, Color.Black);
             _spriteBatch.DrawString(_gameFont, _player2Score.ToString(),_player2ScoreLocation, Color.Black); ;

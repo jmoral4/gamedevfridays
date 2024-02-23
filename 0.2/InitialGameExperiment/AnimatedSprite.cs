@@ -63,7 +63,7 @@ namespace InitialGameExperiment
             }        
         }
 
-        public void Draw(SpriteBatch spriteBatch, Rectangle position, Color color) 
+        public void Draw(SpriteBatch spriteBatch, Rectangle position, Color color, SpriteEffects effect = SpriteEffects.None) 
         {
             int frameIndex = _currentFrame % _animationFrameCount;
 
@@ -71,12 +71,16 @@ namespace InitialGameExperiment
 
             //Rectangle destRect = new Rectangle((int) position.X,(int) position.Y, 144, 144);
 
-            spriteBatch.Draw(_texture, position, sourceRect, color);
+            spriteBatch.Draw(_texture, position, sourceRect, color, 0 , Vector2.Zero, effect, 0);
                /*
                      -------------------------
                     |      x
-                            Source and Dest
 
+
+
+
+
+                            Source and Dest
                     [x.......x]    =>    |----------------------------
                       [x]                |   [ ]
                                          |
