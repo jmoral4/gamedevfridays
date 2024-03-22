@@ -38,6 +38,18 @@
 /processorParam:Quality=Best
 /build:../../../1/Assets/Sounds/ping.wav;ping.wav
 
+#begin ../../../1/Assets/Sprites/1 Woodcutter/knight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../1/Assets/Sprites/1 Woodcutter/knight.png;knight.png
+
 #begin ../../../1/Assets/Sprites/1 Woodcutter/Woodcutter_attack1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +73,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../../1/Assets/Sprites/1 Woodcutter/Woodcutter_walk.png;Woodcutter_walk.png
+
+#begin ../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_death.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_death.png;Woodcutter_death.png
+
+#begin ../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_hurt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_hurt.png;Woodcutter_hurt.png
+
+#begin ../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../2/Assets/Sprites/1 Woodcutter/Woodcutter_idle.png;Woodcutter_idle.png
 
 #begin ball.png
 /importer:TextureImporter

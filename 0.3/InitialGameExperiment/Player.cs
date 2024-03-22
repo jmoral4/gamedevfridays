@@ -1,117 +1,160 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using MonoGame.Extended.Animations.SpriteSheets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.Animations;
+using MonoGame.Extended.Sprites;
+using AnimatedSprite = MonoGame.Extended.Animations.AnimatedSprite;
 
 namespace InitialGameExperiment
 {
-    enum AnimationTypes
-    { 
-        Attack, Idle, RunLeft, RunRight, Jump
+    public abstract class Entity
+    {
+        public bool IsDestroyed { get; private set; }
+
+        protected Entity()
+        {
+            IsDestroyed = false;
+        }
+
+        public abstract void Update(GameTime gameTime);
+        public abstract void Draw(SpriteBatch spriteBatch);
+
+        public virtual void Destroy()
+        {
+            IsDestroyed = true;
+        }
     }
 
-    internal class Player
+    public class Player : Entity
     {
-        public Rectangle Location { get; set; }
-        private Vector2 Velocity;
-        public float MovementSpeed { get; set; } = 100f;
-        private ContentManager _content; 
-        public AnimationTypes CurrentAnimationType { get; set; }
-        public AnimatedSprite CurrentAnimation { get; set; }
+        readonly SpriteSheetAnimationFactory _spriteFactory;
+        private readonly AnimatedSprite _sprite;
+        public RectangleF BoundingBox;
 
-        public Dictionary<AnimationTypes, AnimatedSprite> Animations { get; set; }
+        private float _fireCooldown;
+        public Vector2 Direction => Vector2.UnitX.Rotate(Rotation);
 
-        public Player(ContentManager content, Rectangle startLocation) 
+        public Vector2 Position { get; set; }
+
+        public float Rotation { get; set; } = 0;
+
+        public Vector2 Velocity { get; set; }
+
+        public Vector2 Scale { get; set; }
+
+        public float HackMovementSpeed { get; set; } = 5f;
+
+        public Player(SpriteSheetAnimationFactory spriteFactory)
         {
-            _content = content;
-            Location = startLocation;
-            Animations = new Dictionary<AnimationTypes, AnimatedSprite>();
-            CurrentAnimationType = AnimationTypes.Idle;
-            MovementSpeed = 200f;
+
+            _sprite = new MonoGame.Extended.Animations.AnimatedSprite(spriteFactory);
+            this.Scale = new Vector2(4, 4);
+            this.Position = new Vector2(10, 10);
+            _sprite.Play("idle_down").IsLooping = true;
         }
 
-        public void Init(AnimationTypes initialAnimation)
+        public override void Update(GameTime gameTime)
         {
-            CurrentAnimationType = initialAnimation;
-            CurrentAnimation = Animations[CurrentAnimationType];
+            var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Position += Velocity * deltaTime;
+            Velocity *= 5.0f;
+            if (_fireCooldown > 0)
+            {
+                _fireCooldown -= deltaTime;
+            }
+            _sprite.Update(gameTime);
         }
 
-        public void AddSprite(AnimationTypes animationType, string filename, int frameWidth, int frameHeight, int fps)
+        string _currentDir;
+        public void MoveUp()
         {
-            var anim = new AnimatedSprite(_content, filename, frameWidth, frameHeight, fps);
-            anim.SetAnimation(6);
-            anim.Start();
-            Animations.Add(animationType, anim);
+            _currentDir = "up";
+            _sprite.Play("up").OnCompleted = ReturnToIdle;
+            this.Position = new Vector2(this.Position.X, this.Position.Y - HackMovementSpeed);
         }
 
-        public void RunLeft()
+        public void MoveDown()
         {
-            if (Animations.ContainsKey(AnimationTypes.RunLeft))
+            _currentDir = "down";
+            _sprite.Play("down").OnCompleted = ReturnToIdle;
+            this.Position = new Vector2(this.Position.X, this.Position.Y + HackMovementSpeed);
+        }
+        public void MoveLeft()
+        {
+            _currentDir = "left";
+            _sprite.Play("left").OnCompleted = ReturnToIdle;
+            this.Position = new Vector2(this.Position.X - HackMovementSpeed, this.Position.Y);
+        }
+        public void MoveRight()
+        {
+            _currentDir = "right";
+            _sprite.Play("right").OnCompleted = ReturnToIdle;
+            this.Position = new Vector2(this.Position.X + HackMovementSpeed, this.Position.Y);
+        }
+
+        public void Attack()
+        {
+            switch (_currentDir)
             {
-                CurrentAnimation = Animations[AnimationTypes.RunLeft];
-                CurrentAnimationType = AnimationTypes.RunLeft;
+                case "right":
+                    _sprite.Play("atk_right").OnCompleted = ReturnToIdle;
+                    break;
+                case "left":
+                    _sprite.Play("atk_left").OnCompleted = ReturnToIdle;
+                    break;
+                case "down":
+                    _sprite.Play("atk_down").OnCompleted = ReturnToIdle;
+                    break;
+                case "up":
+                    _sprite.Play("atk_up").OnCompleted = ReturnToIdle;
+                    break;
             }
 
         }
 
-        public void Idle()
+
+        public void ReturnToIdle()
         {
-            if (Animations.ContainsKey(AnimationTypes.Idle))
-            {
-                CurrentAnimation = Animations[AnimationTypes.Idle];
-                CurrentAnimationType = AnimationTypes.Idle;
-            }
+            if (string.IsNullOrEmpty(_currentDir))
+                _currentDir = "down";
+
+            _sprite.Play("idle_" + _currentDir).IsLooping = true;
         }
 
-        public void RunRight()
+
+        public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Animations.ContainsKey(AnimationTypes.RunRight))
-            {
-                CurrentAnimation = Animations[AnimationTypes.RunRight];
-                CurrentAnimationType = AnimationTypes.RunRight;
-            }
+            _sprite.Draw(spriteBatch, this.Position, this.Rotation, this.Scale);
         }
 
-        public void Update(GameTime gameTime)
+        public void Accelerate(float acceleration)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if ( Animations.ContainsKey(CurrentAnimationType) )
-            {
-                var currentAnimation = Animations[CurrentAnimationType];
-                currentAnimation.Update(gameTime);
-            }
-
-            if( CurrentAnimationType == AnimationTypes.RunLeft )
-            {
-                Velocity.X = -MovementSpeed;
-            }
-            if (CurrentAnimationType == AnimationTypes.RunRight)
-            {
-                Velocity.X = MovementSpeed;
-            }
-            if (CurrentAnimationType != AnimationTypes.RunLeft && CurrentAnimationType != AnimationTypes.RunRight)
-            {
-                Velocity = Vector2.Zero;
-            }
-            Location = new Rectangle((int)(Location.X + Velocity.X * deltaTime), (int)(Location.Y + Velocity.Y * deltaTime), Location.Width, Location.Height);
-            //Location.Offset(Velocity * deltaTime);
+            Velocity += Direction * acceleration;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void LookAt(Vector2 point)
         {
-            if (CurrentAnimationType == AnimationTypes.RunLeft)
-            {
-                CurrentAnimation.Draw(spriteBatch, Location, Color.White, SpriteEffects.FlipHorizontally);
+            Rotation = (float)Math.Atan2(point.Y - Position.Y, point.X - Position.X);
+        }
 
-            }
-            else
+        public void Fire()
+        {
+            if (_fireCooldown > 0)
             {
-                CurrentAnimation.Draw(spriteBatch, Location, Color.White);
+                return;
             }
+
+            var angle = Rotation + MathHelper.ToRadians(90);
+            var muzzle1Position = Position + new Vector2(14, 0).Rotate(angle);
+            var muzzle2Position = Position + new Vector2(-14, 0).Rotate(angle);
+            _fireCooldown = 0.2f;
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -294,11 +295,11 @@ namespace GameDev.Shared
         }
 
 
-        //public static void DrawRectangleF(this SpriteBatch spriteBatch, RectangleF rect, Color color)
-        //{
-        //    DrawRectangle(spriteBatch, rect.Position, rect.Size, color);
+        public static void DrawRectangleF(this SpriteBatch spriteBatch, RectangleF rect, Color color)
+        {
+            DrawRectangle(spriteBatch, rect.Position, rect.Size, color);
 
-        //}
+        }
 
         #endregion
 

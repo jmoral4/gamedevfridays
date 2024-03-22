@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace InitialGameExperiment
 {
-    internal class AnimatedSprite
+    internal class AnimatedSprite_Legacy
     {
         private Texture2D _texture;
         private float _timePerFrame;
@@ -24,7 +24,7 @@ namespace InitialGameExperiment
         private int _animationFrameCount;
         private float _totalElapsed;
 
-        public AnimatedSprite(ContentManager contentManager, string textureName, int frameWidth, int frameHeight, float framesPerSeconds)
+        public AnimatedSprite_Legacy(ContentManager contentManager, string textureName, int frameWidth, int frameHeight, float framesPerSeconds)
         { 
             _texture = contentManager.Load<Texture2D>(textureName);
             FrameHeight = frameHeight;
@@ -72,22 +72,9 @@ namespace InitialGameExperiment
             //Rectangle destRect = new Rectangle((int) position.X,(int) position.Y, 144, 144);
 
             spriteBatch.Draw(_texture, position, sourceRect, color, 0 , Vector2.Zero, effect, 0);
-               /*
-                     -------------------------
-                    |      x
-
-
-
-
-
-                            Source and Dest
-                    [x.......x]    =>    |----------------------------
-                      [x]                |   [ ]
-                                         |
-                */
-
 
         }
+
 
 
         public void Start()
